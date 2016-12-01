@@ -8,7 +8,7 @@ use base::Part;
 
 use clap::{Arg, App};
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read};
 use std::process;
 use std::str::FromStr;
 use std::time::{Instant, Duration};
@@ -35,7 +35,13 @@ fn main() {
             process::exit(1);
         }
     };
-    let input = read_input(&input_path);
+    let input = match read_input(&input_path) {
+        Ok(input) => input,
+        Err(e) => {
+            eprintln!("Unable to read input from {}: {}", input_path, e);
+            process::exit(1);
+        }
+    };
 
     let timer = Instant::now();
     match day1::solve(part, input) {
@@ -66,11 +72,11 @@ fn parse_arguments() -> Result<(u8, Part, String), String> {
     Ok((day, part, input_path))
 }
 
-fn read_input(input_path: &str) -> String {
+fn read_input(input_path: &str) -> io::Result<String> {
     let mut input_data = String::new();
-    let mut f = File::open(input_path).unwrap();
-    f.read_to_string(&mut input_data).unwrap();
-    input_data
+    let mut f = File::open(input_path)?;
+    f.read_to_string(&mut input_data)?;
+    Ok(input_data)
 }
 
 fn format_duration(duration: &Duration) -> String {
