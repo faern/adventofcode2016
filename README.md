@@ -26,4 +26,33 @@ Here are my solutions built in Rust. The folder structure is as follows:
 
 #### Example usage
 
-`./target/release/aoc --day 1 --part 2 --input inputs/day1.txt`
+```
+$ ./target/release/aoc --day 1 --part 1 --input inputs/1
+Solution: 301
+Time to solve: 130 us
+```
+
+### Benchmark
+
+Since it might be interesting to know how fast the solution can be obtained
+I added a benchmarking mode to the program.
+
+#### Prerequisites
+
+To get the benchmark feature one must have the nightly version of Rust and
+build the `aoc` crate with the feature `bench`:
+
+`cargo build --release --features "bench"`
+
+Or if nightly is not your default toolchain:
+
+`rustup run nightly cargo build --release --features "bench"`
+
+#### Running benchmarks
+
+It's as easy as adding the `--bench` flag to the run:
+
+```
+$ ./target/release/aoc --day 1 --part 1 --input inputs/1 --bench
+     21,765 ns/iter (+/- 2,916)
+```
