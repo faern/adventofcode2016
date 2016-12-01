@@ -8,8 +8,8 @@ use std::str::FromStr;
 pub fn solve(part: Part, input: String) -> Result<String, String> {
     let steps = parse_input(input)?;
     match part {
-        Part::One => Ok(solve_parsed_part1(&steps).to_string()),
-        Part::Two => Ok(solve_parsed_part2(&steps)?.to_string()),
+        Part::One => Ok(distance_to_endpoint(&steps).to_string()),
+        Part::Two => Ok(distance_to_first_path_overlap(&steps)?.to_string()),
     }
 
 }
@@ -23,19 +23,17 @@ fn parse_input(input: String) -> Result<Vec<Step>, String> {
     Ok(steps)
 }
 
-fn solve_parsed_part1(steps: &[Step]) -> u32 {
-    let mut position = Position(0, 0);
-    let mut direction = Direction::North;
+fn distance_to_endpoint(steps: &[Step]) -> u32 {
+    let (mut position, mut direction) = start_values();
     for step in steps {
         direction = direction.turn(&step.turn());
         position.walk(&direction, step.distance());
     }
-    (position.0.abs() + position.1.abs()) as u32
+    position.distance_from_origo()
 }
 
-fn solve_parsed_part2(steps: &[Step]) -> Result<u32, String> {
-    let mut position = Position(0, 0);
-    let mut direction = Direction::North;
+fn distance_to_first_path_overlap(steps: &[Step]) -> Result<u32, String> {
+    let (mut position, mut direction) = start_values();
     let mut visited = HashSet::new();
     for step in steps {
         direction = direction.turn(&step.turn());
@@ -43,11 +41,15 @@ fn solve_parsed_part2(steps: &[Step]) -> Result<u32, String> {
         for _ in 0..step.distance() {
             position.walk(&direction, normalized_distance);
             if !visited.insert(position) {
-                return Ok((position.0.abs() + position.1.abs()) as u32);
+                return Ok(position.distance_from_origo());
             }
         }
     }
     Err("The given steps does not cross its own path".to_owned())
+}
+
+fn start_values() -> (Position, Direction) {
+    (Position(0, 0), Direction::North)
 }
 
 #[derive(Eq, PartialEq, Debug, Copy, Clone)]
@@ -107,6 +109,10 @@ impl Position {
         self.0 += vector.0 * distance as i32;
         self.1 += vector.1 * distance as i32;
     }
+
+    pub fn distance_from_origo(&self) -> u32 {
+        (self.0.abs() + self.1.abs()) as u32
+    }
 }
 
 enum Direction {
@@ -155,7 +161,8 @@ impl Direction {
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
-    use super::{Turn, Step, Direction, Position, solve_parsed_part1};
+    use super::{Turn, Step, Direction, Position, distance_to_endpoint,
+                distance_to_first_path_overlap};
 
     #[test]
     fn step_from_str_r() {
@@ -199,37 +206,54 @@ mod tests {
 
     #[test]
     fn stand_still() {
-        let result = solve_parsed_part1(&[]);
+        let result = distance_to_endpoint(&[]);
         assert_eq!(0, result);
     }
 
     #[test]
-    fn solve_parsed_part1_single_step() {
+    fn distance_to_endpoint_single_step() {
         let step = Step::from_str("R1").unwrap();
-        let result = solve_parsed_part1(&[step]);
+        let result = distance_to_endpoint(&[step]);
         assert_eq!(1, result);
     }
 
     #[test]
-    fn solve_parsed_part1_two_steps() {
+    fn distance_to_endpoint_two_steps() {
         let steps = [Step::from_str("R100").unwrap(), Step::from_str("R50").unwrap()];
-        let result = solve_parsed_part1(&steps);
+        let result = distance_to_endpoint(&steps);
         assert_eq!(150, result);
     }
 
     #[test]
-    fn solve_parsed_part1_negative() {
+    fn distance_to_endpoint_negative() {
         let steps = [Step::from_str("L-40").unwrap(), Step::from_str("R-20").unwrap()];
-        let result = solve_parsed_part1(&steps);
+        let result = distance_to_endpoint(&steps);
         assert_eq!(60, result);
     }
 
     #[test]
-    fn solve_parsed_part1_going_back() {
+    fn distance_to_endpoint_going_back() {
         let steps = [Step::from_str("R10").unwrap(),
                      Step::from_str("R10").unwrap(),
                      Step::from_str("R10").unwrap()];
-        let result = solve_parsed_part1(&steps);
+        let result = distance_to_endpoint(&steps);
         assert_eq!(10, result);
+    }
+
+    #[test]
+    fn distance_to_first_path_overlap_no_crossing() {
+        let step = Step::from_str("R1").unwrap();
+        let result = distance_to_first_path_overlap(&[step]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn distance_to_first_path_overlap_crossing() {
+        let steps = [Step::from_str("R8").unwrap(),
+                     Step::from_str("R4").unwrap(),
+                     Step::from_str("R4").unwrap(),
+                     Step::from_str("R8").unwrap()];
+        let result = distance_to_first_path_overlap(&steps).unwrap();
+        assert_eq!(4, result);
     }
 }
