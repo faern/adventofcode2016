@@ -1,12 +1,15 @@
+extern crate base;
+
+use base::Part;
+
 use std::str::FromStr;
 use std::collections::HashSet;
 
-pub fn solve(part: u8, input: String) -> Result<String, String> {
+pub fn solve(part: Part, input: String) -> Result<String, String> {
     let steps = parse_input(input)?;
     match part {
-        1 => Ok(solve_parsed_part1(&steps).to_string()),
-        2 => Ok(solve_parsed_part2(&steps)?.to_string()),
-        _ => unreachable!(),
+        Part::One => Ok(solve_parsed_part1(&steps).to_string()),
+        Part::Two => Ok(solve_parsed_part2(&steps)?.to_string()),
     }
 
 }
