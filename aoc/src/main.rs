@@ -1,13 +1,17 @@
 #[macro_use]
 extern crate clap;
 
+extern crate base;
 extern crate day1;
+
+use base::Part;
 
 use clap::{Arg, App};
 use std::fs::File;
 use std::io::Read;
 use std::time::{Instant, Duration};
 use std::process;
+use std::str::FromStr;
 
 
 static APP_NAME: &'static str = "Advent of Code 2016 CLI";
@@ -46,7 +50,7 @@ fn main() {
     }
 }
 
-fn parse_arguments() -> Result<(u8, u8, String), String> {
+fn parse_arguments() -> Result<(u8, Part, String), String> {
     let app = create_app();
     let matches = app.clone().get_matches();
 
@@ -54,10 +58,7 @@ fn parse_arguments() -> Result<(u8, u8, String), String> {
     if day < 1 || day > 25 {
         return Err("Day must be 1-25".to_owned());
     }
-    let part = value_t!(matches.value_of("part"), u8).unwrap();
-    if part < 1 || part > 2 {
-        return Err("Part must be 1 or 2".to_owned());
-    }
+    let part = Part::from_str(matches.value_of("part").unwrap())?;
     let input_path = matches.value_of("input").unwrap().to_owned();
 
     Ok((day, part, input_path))

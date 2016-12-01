@@ -5,4 +5,5 @@ authors = ["Linus Färnstrand <faern@faern.net>"]
 
 [dependencies]
 clap = "2"
+base = { path = "../base" }
 day1 = { path = "../day1" }
