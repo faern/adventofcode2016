@@ -4,7 +4,7 @@ extern crate clap;
 extern crate base;
 extern crate day1;
 
-use base::Part;
+use base::{Part, ProblemSolver};
 
 use clap::{Arg, App};
 use std::fs::File;
@@ -36,9 +36,13 @@ fn main() {
         eprintln!("Unable to read input from {}: {}", input_path, e);
         process::exit(1);
     });
+    let solver = get_problem_solver(day).unwrap_or_else(|e| {
+        eprintln!("Error with problem solver: {}", e);
+        process::exit(1);
+    });
 
     let solution_timer = Instant::now();
-    let solution = day1::solve(part, input).unwrap_or_else(|e| {
+    let solution = solver.solve(part, input).unwrap_or_else(|e| {
         eprintln!("Unable to solve problem {}.{}: {}", day, part, e);
         process::exit(1);
     });
@@ -68,6 +72,13 @@ fn read_input(input_path: &str) -> io::Result<String> {
     let mut f = File::open(input_path)?;
     f.read_to_string(&mut input_data)?;
     Ok(input_data)
+}
+
+fn get_problem_solver(day: u8) -> Result<Box<ProblemSolver>, String> {
+    match day {
+        1 => Ok(day1::get_solver()),
+        _ => Err(format!("No solver for day {}", day)),
+    }
 }
 
 fn format_duration(duration: &Duration) -> String {

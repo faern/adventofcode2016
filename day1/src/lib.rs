@@ -1,17 +1,25 @@
 extern crate base;
 
-use base::Part;
+use base::{Part, ProblemSolver};
 
 use std::collections::HashSet;
 use std::str::FromStr;
 
-pub fn solve(part: Part, input: String) -> Result<String, String> {
-    let steps = parse_input(input)?;
-    match part {
-        Part::One => Ok(distance_to_endpoint(&steps).to_string()),
-        Part::Two => Ok(distance_to_first_path_overlap(&steps)?.to_string()),
-    }
+pub fn get_solver() -> Box<ProblemSolver> {
+    Box::new(Day1)
+}
 
+struct Day1;
+
+impl ProblemSolver for Day1 {
+    fn solve(&self, part: Part, input: String) -> Result<String, String> {
+        let steps = parse_input(input)?;
+        match part {
+            Part::One => Ok(distance_to_endpoint(&steps).to_string()),
+            Part::Two => Ok(distance_to_first_path_overlap(&steps)?.to_string()),
+        }
+
+    }
 }
 
 fn parse_input(input: String) -> Result<Vec<Step>, String> {

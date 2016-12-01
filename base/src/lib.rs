@@ -1,6 +1,10 @@
 use std::fmt;
 use std::str::FromStr;
 
+pub trait ProblemSolver {
+    fn solve(&self, part: Part, input: String) -> Result<String, String>;
+}
+
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 /// Represents part one or two of a problem in AoC
 pub enum Part {
