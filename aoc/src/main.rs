@@ -28,34 +28,25 @@ macro_rules! eprintln {
 }
 
 fn main() {
-    let (day, part, input_path) = match parse_arguments() {
-        Ok(result) => result,
-        Err(e) => {
-            eprintln!("Unable to parse arguments: {}", e);
-            process::exit(1);
-        }
-    };
-    let input = match read_input(&input_path) {
-        Ok(input) => input,
-        Err(e) => {
-            eprintln!("Unable to read input from {}: {}", input_path, e);
-            process::exit(1);
-        }
-    };
+    let (day, part, input_path) = parse_arguments().unwrap_or_else(|e| {
+        eprintln!("Unable to parse arguments: {}", e);
+        process::exit(1);
+    });
+    let input = read_input(&input_path).unwrap_or_else(|e| {
+        eprintln!("Unable to read input from {}: {}", input_path, e);
+        process::exit(1);
+    });
 
-    let timer = Instant::now();
-    match day1::solve(part, input) {
-        Ok(solution) => {
-            let time = timer.elapsed();
-            println!("Solution: {}\nTime to solve: {}",
-                     solution,
-                     format_duration(&time));
-        }
-        Err(e) => {
-            eprintln!("Unable to solve problem {}.{}: {}", day, part, e);
-            process::exit(1);
-        }
-    }
+    let solution_timer = Instant::now();
+    let solution = day1::solve(part, input).unwrap_or_else(|e| {
+        eprintln!("Unable to solve problem {}.{}: {}", day, part, e);
+        process::exit(1);
+    });
+
+    let time = solution_timer.elapsed();
+    println!("Solution: {}\nTime to solve: {}",
+             solution,
+             format_duration(&time));
 }
 
 fn parse_arguments() -> Result<(u8, Part, String), String> {
