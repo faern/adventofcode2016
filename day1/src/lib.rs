@@ -1,8 +1,14 @@
 use std::str::FromStr;
+use std::collections::HashSet;
 
-pub fn solve(input: String) -> Result<String, String> {
+pub fn solve(part: u8, input: String) -> Result<String, String> {
     let steps = parse_input(input)?;
-    Ok(solve_parsed(&steps).to_string())
+    match part {
+        1 => Ok(solve_parsed_part1(&steps).to_string()),
+        2 => Ok(solve_parsed_part2(&steps)?.to_string()),
+        _ => unreachable!(),
+    }
+
 }
 
 fn parse_input(input: String) -> Result<Vec<Step>, String> {
@@ -14,7 +20,7 @@ fn parse_input(input: String) -> Result<Vec<Step>, String> {
     Ok(steps)
 }
 
-fn solve_parsed(steps: &[Step]) -> u32 {
+fn solve_parsed_part1(steps: &[Step]) -> u32 {
     let mut position = Position(0, 0);
     let mut direction = Direction::North;
     for step in steps {
@@ -22,6 +28,27 @@ fn solve_parsed(steps: &[Step]) -> u32 {
         position.walk(&direction, step.distance());
     }
     (position.0.abs() + position.1.abs()) as u32
+}
+
+fn solve_parsed_part2(steps: &[Step]) -> Result<u32, String> {
+    let mut position = Position(0, 0);
+    let mut direction = Direction::North;
+    let mut visited = HashSet::new();
+    for step in steps {
+        direction = direction.turn(&step.turn());
+        let normalized_distance = if step.distance() > 0 {
+            1
+        } else {
+            -1
+        };
+        for _ in 0..step.distance() {
+            position.walk(&direction, normalized_distance);
+            if !visited.insert(position) {
+                return Ok((position.0.abs() + position.1.abs()) as u32)
+            }
+        }
+    }
+    Err("The given steps does not cross its own path".to_owned())
 }
 
 #[derive(Eq, PartialEq, Debug, Copy, Clone)]
@@ -71,7 +98,7 @@ impl FromStr for Step {
     }
 }
 
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Hash, Debug, Copy, Clone)]
 struct Position(i32, i32);
 
 impl Position {
@@ -127,7 +154,7 @@ impl Direction {
 
 #[cfg(test)]
 mod tests {
-    use super::{Turn, Step, Direction, Position, solve_parsed};
+    use super::{Turn, Step, Direction, Position, solve_parsed_part1};
     use std::str::FromStr;
 
     #[test]
@@ -172,45 +199,45 @@ mod tests {
 
     #[test]
     fn stand_still() {
-        let result = solve_parsed(&[]);
+        let result = solve_parsed_part1(&[]);
         assert_eq!(0, result);
     }
 
     #[test]
-    fn solve_parsed_single_step() {
+    fn solve_parsed_part1_single_step() {
         let step = Step::from_str("R1").unwrap();
-        let result = solve_parsed(&[step]);
+        let result = solve_parsed_part1(&[step]);
         assert_eq!(1, result);
     }
 
     #[test]
-    fn solve_parsed_two_steps() {
+    fn solve_parsed_part1_two_steps() {
         let steps = [
             Step::from_str("R100").unwrap(),
             Step::from_str("R50").unwrap(),
         ];
-        let result = solve_parsed(&steps);
+        let result = solve_parsed_part1(&steps);
         assert_eq!(150, result);
     }
 
     #[test]
-    fn solve_parsed_negative() {
+    fn solve_parsed_part1_negative() {
         let steps = [
             Step::from_str("L-40").unwrap(),
             Step::from_str("R-20").unwrap(),
         ];
-        let result = solve_parsed(&steps);
+        let result = solve_parsed_part1(&steps);
         assert_eq!(60, result);
     }
 
     #[test]
-    fn solve_parsed_going_back() {
+    fn solve_parsed_part1_going_back() {
         let steps = [
             Step::from_str("R10").unwrap(),
             Step::from_str("R10").unwrap(),
             Step::from_str("R10").unwrap(),
         ];
-        let result = solve_parsed(&steps);
+        let result = solve_parsed_part1(&steps);
         assert_eq!(10, result);
     }
 }
