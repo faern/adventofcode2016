@@ -1,8 +1,8 @@
 extern crate base;
 
 use base::Part;
-use std::collections::HashSet;
 
+use std::collections::HashSet;
 use std::str::FromStr;
 
 pub fn solve(part: Part, input: String) -> Result<String, String> {
