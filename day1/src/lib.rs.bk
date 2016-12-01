@@ -39,11 +39,15 @@ fn solve_parsed_part2(steps: &[Step]) -> Result<u32, String> {
     let mut visited = HashSet::new();
     for step in steps {
         direction = direction.turn(&step.turn());
-        let normalized_distance = if step.distance() > 0 { 1 } else { -1 };
+        let normalized_distance = if step.distance() > 0 {
+            1
+        } else {
+            -1
+        };
         for _ in 0..step.distance() {
             position.walk(&direction, normalized_distance);
             if !visited.insert(position) {
-                return Ok((position.0.abs() + position.1.abs()) as u32);
+                return Ok((position.0.abs() + position.1.abs()) as u32)
             }
         }
     }
@@ -89,8 +93,7 @@ impl FromStr for Step {
         let turn_str = chars.next().ok_or("No direction at start".to_owned())?;
         let turn = Turn::from_str(&turn_str.to_string())?;
         let distance_str = chars.as_str();
-        let distance =
-            i32::from_str(distance_str).map_err(|_| format!("Invalid distance: {}", distance_str))?;
+        let distance = i32::from_str(distance_str).map_err(|_| format!("Invalid distance: {}", distance_str))?;
         Ok(Step {
             turn: turn,
             distance: distance,
@@ -212,23 +215,31 @@ mod tests {
 
     #[test]
     fn solve_parsed_part1_two_steps() {
-        let steps = [Step::from_str("R100").unwrap(), Step::from_str("R50").unwrap()];
+        let steps = [
+            Step::from_str("R100").unwrap(),
+            Step::from_str("R50").unwrap(),
+        ];
         let result = solve_parsed_part1(&steps);
         assert_eq!(150, result);
     }
 
     #[test]
     fn solve_parsed_part1_negative() {
-        let steps = [Step::from_str("L-40").unwrap(), Step::from_str("R-20").unwrap()];
+        let steps = [
+            Step::from_str("L-40").unwrap(),
+            Step::from_str("R-20").unwrap(),
+        ];
         let result = solve_parsed_part1(&steps);
         assert_eq!(60, result);
     }
 
     #[test]
     fn solve_parsed_part1_going_back() {
-        let steps = [Step::from_str("R10").unwrap(),
-                     Step::from_str("R10").unwrap(),
-                     Step::from_str("R10").unwrap()];
+        let steps = [
+            Step::from_str("R10").unwrap(),
+            Step::from_str("R10").unwrap(),
+            Step::from_str("R10").unwrap(),
+        ];
         let result = solve_parsed_part1(&steps);
         assert_eq!(10, result);
     }

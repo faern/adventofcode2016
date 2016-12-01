@@ -41,8 +41,10 @@ fn main() {
     match day1::solve(part, input) {
         Ok(solution) => {
             let time = timer.elapsed();
-            println!("Solution: {}\nTime to solve: {}", solution, format_duration(&time));
-        },
+            println!("Solution: {}\nTime to solve: {}",
+                     solution,
+                     format_duration(&time));
+        }
         Err(e) => {
             eprintln!("Unable to solve problem {}.{}: {}", day, part, e);
             process::exit(1);

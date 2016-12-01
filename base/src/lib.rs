@@ -6,7 +6,7 @@ use std::string::ToString;
 /// Represents part one or two of a problem in AoC
 pub enum Part {
     One,
-    Two
+    Two,
 }
 
 impl FromStr for Part {
@@ -22,9 +22,11 @@ impl FromStr for Part {
 
 impl fmt::Display for Part {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match *self {
-            Part::One => "1",
-            Part::Two => "2",
-        })
+        write!(f,
+               "{}",
+               match *self {
+                   Part::One => "1",
+                   Part::Two => "2",
+               })
     }
 }
