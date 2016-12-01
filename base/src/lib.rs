@@ -1,5 +1,6 @@
-use std::str::FromStr;
+
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 /// Represents part one or two of a problem in AoC

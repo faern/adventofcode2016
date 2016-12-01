@@ -1,9 +1,9 @@
 extern crate base;
 
 use base::Part;
+use std::collections::HashSet;
 
 use std::str::FromStr;
-use std::collections::HashSet;
 
 pub fn solve(part: Part, input: String) -> Result<String, String> {
     let steps = parse_input(input)?;
@@ -154,8 +154,8 @@ impl Direction {
 
 #[cfg(test)]
 mod tests {
-    use super::{Turn, Step, Direction, Position, solve_parsed_part1};
     use std::str::FromStr;
+    use super::{Turn, Step, Direction, Position, solve_parsed_part1};
 
     #[test]
     fn step_from_str_r() {

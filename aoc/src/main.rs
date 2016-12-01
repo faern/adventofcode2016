@@ -9,9 +9,9 @@ use base::Part;
 use clap::{Arg, App};
 use std::fs::File;
 use std::io::Read;
-use std::time::{Instant, Duration};
 use std::process;
 use std::str::FromStr;
+use std::time::{Instant, Duration};
 
 
 static APP_NAME: &'static str = "Advent of Code 2016 CLI";
