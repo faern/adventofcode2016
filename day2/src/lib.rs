@@ -39,7 +39,6 @@ fn enter_code<P>(movements: Vec<Vec<Direction>>, mut keypad: KeyPad<P>) -> Resul
 {
     let mut code = vec![];
     for one_digit_movements in movements {
-        keypad.reset();
         for movement in one_digit_movements {
             keypad.walk(&movement);
         }
