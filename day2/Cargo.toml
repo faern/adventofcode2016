@@ -1,14 +1,7 @@
 [package]
-name = "aoc"
+name = "day2"
 version = "0.1.0"
 authors = ["Linus Färnstrand <faern@faern.net>"]
 
 [dependencies]
-clap = "2"
 base = { path = "../base" }
-day1 = { path = "../day1" }
-day2 = { path = "../day2" }
-
-[features]
-default = []
-bench = []

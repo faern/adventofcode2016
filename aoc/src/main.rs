@@ -8,6 +8,7 @@ extern crate test;
 
 extern crate base;
 extern crate day1;
+extern crate day2;
 
 use base::{Part, ProblemSolver};
 
@@ -105,6 +106,7 @@ fn read_input(input_path: &str) -> io::Result<String> {
 fn get_problem_solver(day: u8) -> Result<Box<ProblemSolver>, String> {
     match day {
         1 => Ok(day1::get_solver()),
+        2 => Ok(day2::get_solver()),
         _ => Err(format!("No solver for day {}", day)),
     }
 }
