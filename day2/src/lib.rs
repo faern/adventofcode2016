@@ -182,52 +182,52 @@ impl KeyPad for CrazyKeyPad {
 
 #[cfg(test)]
 mod tests {
-    use super::KeyPad;
+    use super::{KeyPad, SaneKeyPad};
     use base::geo::Direction;
 
     #[test]
     fn keypad_new() {
-        let keypad = KeyPad::new();
-        assert_eq!(5, keypad.key());
+        let keypad = SaneKeyPad::new();
+        assert_eq!("5", keypad.key());
     }
 
     #[test]
     fn keypad_move() {
-        let mut keypad = KeyPad::new();
+        let mut keypad = SaneKeyPad::new();
         keypad.walk(&Direction::North);
-        assert_eq!(2, keypad.key());
+        assert_eq!("2", keypad.key());
     }
 
     #[test]
     fn keypad_move_too_far() {
-        let mut keypad = KeyPad::new();
+        let mut keypad = SaneKeyPad::new();
         keypad.walk(&Direction::North);
         keypad.walk(&Direction::East);
         keypad.walk(&Direction::East);
-        assert_eq!(3, keypad.key());
+        assert_eq!("3", keypad.key());
     }
 
     #[test]
     fn keypad_move_down_and_away() {
-        let mut keypad = KeyPad::new();
+        let mut keypad = SaneKeyPad::new();
         keypad.walk(&Direction::South);
-        assert_eq!(8, keypad.key());
+        assert_eq!("8", keypad.key());
         keypad.walk(&Direction::South);
-        assert_eq!(8, keypad.key());
+        assert_eq!("8", keypad.key());
         keypad.walk(&Direction::East);
-        assert_eq!(9, keypad.key());
+        assert_eq!("9", keypad.key());
         keypad.walk(&Direction::West);
         keypad.walk(&Direction::West);
-        assert_eq!(7, keypad.key());
+        assert_eq!("7", keypad.key());
         keypad.walk(&Direction::West);
-        assert_eq!(7, keypad.key());
+        assert_eq!("7", keypad.key());
     }
 
     #[test]
     fn keypad_move_to_start() {
-        let mut keypad = KeyPad::new();
+        let mut keypad = SaneKeyPad::new();
         keypad.walk(&Direction::North);
         keypad.walk(&Direction::South);
-        assert_eq!(5, keypad.key());
+        assert_eq!("5", keypad.key());
     }
 }
