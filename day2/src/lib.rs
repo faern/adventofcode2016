@@ -69,9 +69,7 @@ struct SaneKeyPad {
 
 impl SaneKeyPad {
     pub fn new() -> Self {
-        SaneKeyPad {
-            active_key: Self::initial_position(),
-        }
+        SaneKeyPad { active_key: Self::initial_position() }
     }
 
     fn initial_position() -> Position {
@@ -123,9 +121,7 @@ struct CrazyKeyPad {
 
 impl CrazyKeyPad {
     pub fn new() -> Self {
-        CrazyKeyPad {
-            active_key: Self::initial_position(),
-        }
+        CrazyKeyPad { active_key: Self::initial_position() }
     }
 
     fn initial_position() -> Position {
@@ -182,8 +178,8 @@ impl KeyPad for CrazyKeyPad {
 
 #[cfg(test)]
 mod tests {
-    use super::{KeyPad, SaneKeyPad};
     use base::geo::Direction;
+    use super::{KeyPad, SaneKeyPad};
 
     #[test]
     fn keypad_new() {
