@@ -1,6 +1,8 @@
 use std::fmt;
 use std::str::FromStr;
 
+pub mod geo;
+
 pub trait ProblemSolver {
     fn solve(&self, part: Part, input: String) -> Result<String, String>;
 }
