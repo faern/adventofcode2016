@@ -15,8 +15,8 @@ impl ProblemSolver for Day2 {
     fn solve(&self, part: Part, input: String) -> Result<String, String> {
         let movements = parse_input(input)?;
         match part {
-            Part::One => enter_code(movements, Box::new(KeyPad::new(SaneKeyPadPositions))),
-            Part::Two => enter_code(movements, Box::new(KeyPad::new(CrazyKeyPadPositions))),
+            Part::One => enter_code(movements, KeyPad::new(SaneKeyPadPositions)),
+            Part::Two => enter_code(movements, KeyPad::new(CrazyKeyPadPositions)),
         }
     }
 }
@@ -34,7 +34,7 @@ fn parse_input(input: String) -> Result<Vec<Vec<Direction>>, String> {
     Ok(movements)
 }
 
-fn enter_code<P>(movements: Vec<Vec<Direction>>, mut keypad: Box<KeyPad<P>>) -> Result<String, String>
+fn enter_code<P>(movements: Vec<Vec<Direction>>, mut keypad: KeyPad<P>) -> Result<String, String>
     where P: KeyPadPositions
 {
     let mut code = vec![];
