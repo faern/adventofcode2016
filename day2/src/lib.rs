@@ -15,8 +15,8 @@ impl ProblemSolver for Day2 {
     fn solve(&self, part: Part, input: String) -> Result<String, String> {
         let movements = parse_input(input)?;
         match part {
-            Part::One => enter_code(movements, Box::new(SaneKeyPad::new())),
-            Part::Two => enter_code(movements, Box::new(CrazyKeyPad::new())),
+            Part::One => enter_code(movements, Box::new(KeyPad::new(SaneKeyPadPositions))),
+            Part::Two => enter_code(movements, Box::new(KeyPad::new(CrazyKeyPadPositions))),
         }
     }
 }
@@ -34,7 +34,9 @@ fn parse_input(input: String) -> Result<Vec<Vec<Direction>>, String> {
     Ok(movements)
 }
 
-fn enter_code(movements: Vec<Vec<Direction>>, mut keypad: Box<KeyPad>) -> Result<String, String> {
+fn enter_code<P>(movements: Vec<Vec<Direction>>, mut keypad: Box<KeyPad<P>>) -> Result<String, String>
+    where P: KeyPadPositions
+{
     let mut code = vec![];
     for one_digit_movements in movements {
         keypad.reset();
@@ -46,30 +48,57 @@ fn enter_code(movements: Vec<Vec<Direction>>, mut keypad: Box<KeyPad>) -> Result
     Ok(code.join(""))
 }
 
-trait KeyPad {
-    fn active_position(&self) -> Position;
-    fn set_active_position(&mut self, position: Position) -> Result<(), ()>;
+struct KeyPad<P: KeyPadPositions> {
+    positions: P,
+    active_position: Position,
+}
 
-    fn key(&self) -> String;
-
-    fn walk(&mut self, direction: &Direction) {
-        let mut new_active_key = self.active_position().clone();
-        new_active_key.walk(direction, 1);
-        self.set_active_position(new_active_key).unwrap_or(());
+impl<P: KeyPadPositions> KeyPad<P> {
+    pub fn new(positions: P) -> Self {
+        KeyPad {
+            positions: positions,
+            active_position: P::initial_position(),
+        }
     }
 
-    fn reset(&mut self);
+    pub fn walk(&mut self, direction: &Direction) {
+        let mut new_active_position = self.active_position.clone();
+        new_active_position.walk(direction, 1);
+        if self.positions.key(&new_active_position).is_ok() {
+            self.active_position = new_active_position;
+        }
+    }
 
-    fn is_valid_position(&self, position: &Position) -> bool;
+    pub fn key(&self) -> String {
+        self.positions.key(&self.active_position).unwrap()
+    }
+
+    pub fn reset(&mut self) {
+        self.active_position = P::initial_position();
+    }
 }
 
-struct SaneKeyPad {
-    active_key: Position,
+trait KeyPadPositions {
+    fn key(&self, position: &Position) -> Result<String, ()>;
+    fn initial_position() -> Position;
 }
 
-impl SaneKeyPad {
-    pub fn new() -> Self {
-        SaneKeyPad { active_key: Self::initial_position() }
+struct SaneKeyPadPositions;
+
+impl KeyPadPositions for SaneKeyPadPositions {
+    fn key(&self, position: &Position) -> Result<String, ()> {
+        match *position {
+            Position(0, 2) => Ok(1.to_string()),
+            Position(1, 2) => Ok(2.to_string()),
+            Position(2, 2) => Ok(3.to_string()),
+            Position(0, 1) => Ok(4.to_string()),
+            Position(1, 1) => Ok(5.to_string()),
+            Position(2, 1) => Ok(6.to_string()),
+            Position(0, 0) => Ok(7.to_string()),
+            Position(1, 0) => Ok(8.to_string()),
+            Position(2, 0) => Ok(9.to_string()),
+            _ => Err(()),
+        }
     }
 
     fn initial_position() -> Position {
@@ -77,51 +106,31 @@ impl SaneKeyPad {
     }
 }
 
-impl KeyPad for SaneKeyPad {
-    fn active_position(&self) -> Position {
-        self.active_key
-    }
+struct CrazyKeyPadPositions;
 
-    fn set_active_position(&mut self, position: Position) -> Result<(), ()> {
-        if self.is_valid_position(&position) {
-            self.active_key = position;
-            Ok(())
-        } else {
-            Err(())
+impl KeyPadPositions for CrazyKeyPadPositions {
+    fn key(&self, position: &Position) -> Result<String, ()> {
+        match *position {
+            Position(0, 2) => Ok("1".to_owned()),
+
+            Position(-1, 1) => Ok("2".to_owned()),
+            Position(0, 1) => Ok("3".to_owned()),
+            Position(1, 1) => Ok("4".to_owned()),
+
+            Position(-2, 0) => Ok("5".to_owned()),
+            Position(-1, 0) => Ok("6".to_owned()),
+            Position(0, 0) => Ok("7".to_owned()),
+            Position(1, 0) => Ok("8".to_owned()),
+            Position(2, 0) => Ok("9".to_owned()),
+
+            Position(-1, -1) => Ok("A".to_owned()),
+            Position(0, -1) => Ok("B".to_owned()),
+            Position(1, -1) => Ok("C".to_owned()),
+
+            Position(0, -2) => Ok("D".to_owned()),
+
+            _ => Err(()),
         }
-    }
-
-    fn key(&self) -> String {
-        match self.active_key {
-            Position(0, 2) => 1.to_string(),
-            Position(1, 2) => 2.to_string(),
-            Position(2, 2) => 3.to_string(),
-            Position(0, 1) => 4.to_string(),
-            Position(1, 1) => 5.to_string(),
-            Position(2, 1) => 6.to_string(),
-            Position(0, 0) => 7.to_string(),
-            Position(1, 0) => 8.to_string(),
-            Position(2, 0) => 9.to_string(),
-            _ => unreachable!(),
-        }
-    }
-
-    fn reset(&mut self) {
-        self.active_key = Self::initial_position();
-    }
-
-    fn is_valid_position(&self, position: &Position) -> bool {
-        !(position.0 < 0 || position.0 > 2 || position.1 < 0 || position.1 > 2)
-    }
-}
-
-struct CrazyKeyPad {
-    active_key: Position,
-}
-
-impl CrazyKeyPad {
-    pub fn new() -> Self {
-        CrazyKeyPad { active_key: Self::initial_position() }
     }
 
     fn initial_position() -> Position {
@@ -129,74 +138,27 @@ impl CrazyKeyPad {
     }
 }
 
-impl KeyPad for CrazyKeyPad {
-    fn active_position(&self) -> Position {
-        self.active_key
-    }
-
-    fn set_active_position(&mut self, position: Position) -> Result<(), ()> {
-        if self.is_valid_position(&position) {
-            self.active_key = position;
-            Ok(())
-        } else {
-            Err(())
-        }
-    }
-
-    fn key(&self) -> String {
-        match self.active_key {
-            Position(0, 2) => "1".to_owned(),
-
-            Position(-1, 1) => "2".to_owned(),
-            Position(0, 1) => "3".to_owned(),
-            Position(1, 1) => "4".to_owned(),
-
-            Position(-2, 0) => "5".to_owned(),
-            Position(-1, 0) => "6".to_owned(),
-            Position(0, 0) => "7".to_owned(),
-            Position(1, 0) => "8".to_owned(),
-            Position(2, 0) => "9".to_owned(),
-
-            Position(-1, -1) => "A".to_owned(),
-            Position(0, -1) => "B".to_owned(),
-            Position(1, -1) => "C".to_owned(),
-
-            Position(0, -2) => "D".to_owned(),
-
-            _ => unreachable!(),
-        }
-    }
-
-    fn reset(&mut self) {
-        self.active_key = Self::initial_position();
-    }
-
-    fn is_valid_position(&self, position: &Position) -> bool {
-        (position.0.abs() + position.1.abs()) <= 2
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use base::geo::Direction;
-    use super::{KeyPad, SaneKeyPad};
+    use super::{KeyPad, SaneKeyPadPositions};
 
     #[test]
     fn keypad_new() {
-        let keypad = SaneKeyPad::new();
+        let keypad = KeyPad::new(SaneKeyPadPositions);
         assert_eq!("5", keypad.key());
     }
 
     #[test]
     fn keypad_move() {
-        let mut keypad = SaneKeyPad::new();
+        let mut keypad = KeyPad::new(SaneKeyPadPositions);
         keypad.walk(&Direction::North);
         assert_eq!("2", keypad.key());
     }
 
     #[test]
     fn keypad_move_too_far() {
-        let mut keypad = SaneKeyPad::new();
+        let mut keypad = KeyPad::new(SaneKeyPadPositions);
         keypad.walk(&Direction::North);
         keypad.walk(&Direction::East);
         keypad.walk(&Direction::East);
@@ -205,7 +167,7 @@ mod tests {
 
     #[test]
     fn keypad_move_down_and_away() {
-        let mut keypad = SaneKeyPad::new();
+        let mut keypad = KeyPad::new(SaneKeyPadPositions);
         keypad.walk(&Direction::South);
         assert_eq!("8", keypad.key());
         keypad.walk(&Direction::South);
@@ -221,7 +183,7 @@ mod tests {
 
     #[test]
     fn keypad_move_to_start() {
-        let mut keypad = SaneKeyPad::new();
+        let mut keypad = KeyPad::new(SaneKeyPadPositions);
         keypad.walk(&Direction::North);
         keypad.walk(&Direction::South);
         assert_eq!("5", keypad.key());
