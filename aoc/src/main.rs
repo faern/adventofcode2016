@@ -9,6 +9,7 @@ extern crate test;
 extern crate base;
 extern crate day1;
 extern crate day2;
+extern crate day3;
 
 use base::{Part, ProblemSolver};
 
@@ -50,7 +51,7 @@ fn main() {
         benchmark(solver, part, input);
     } else {
         solve(solver, day, part, input);
-     }
+    }
 }
 
 fn solve(solver: Box<ProblemSolver>, day: u8, part: Part, input: String) {
@@ -70,9 +71,7 @@ fn solve(solver: Box<ProblemSolver>, day: u8, part: Part, input: String) {
 fn benchmark(solver: Box<ProblemSolver>, part: Part, input: String) {
     use test::{fmt_bench_samples, bench, black_box, Bencher};
     let samples = bench::benchmark(|b: &mut Bencher| {
-        b.iter(|| {
-            solver.solve(part, black_box(input.clone())).unwrap()
-        })
+        b.iter(|| solver.solve(part, black_box(input.clone())).unwrap())
     });
     println!("{}", fmt_bench_samples(&samples));
 }
@@ -107,6 +106,7 @@ fn get_problem_solver(day: u8) -> Result<Box<ProblemSolver>, String> {
     match day {
         1 => Ok(day1::get_solver()),
         2 => Ok(day2::get_solver()),
+        3 => Ok(day3::get_solver()),
         _ => Err(format!("No solver for day {}", day)),
     }
 }

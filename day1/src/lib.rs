@@ -19,7 +19,6 @@ impl ProblemSolver for Day1 {
             Part::One => Ok(distance_to_endpoint(&steps).to_string()),
             Part::Two => Ok(distance_to_first_path_overlap(&steps)?.to_string()),
         }
-
     }
 }
 
@@ -63,9 +62,9 @@ fn start_values() -> (Position, Direction) {
 
 #[cfg(test)]
 mod tests {
+    use base::geo::Step;
     use std::str::FromStr;
     use super::{distance_to_endpoint, distance_to_first_path_overlap};
-    use base::geo::Step;
 
     #[test]
     fn stand_still() {

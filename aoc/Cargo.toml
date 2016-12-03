@@ -8,6 +8,7 @@ clap = "2"
 base = { path = "../base" }
 day1 = { path = "../day1" }
 day2 = { path = "../day2" }
+day3 = { path = "../day3" }
 
 [features]
 default = []
